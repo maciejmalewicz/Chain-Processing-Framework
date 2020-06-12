@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
     private List<ChainNode<? super Model>> nodes;
-    private ChainExecutor<Model> executor;
+    //private ChainExecutor<Model> executor;
     private HashMap<Integer, Integer> nodesMap;
     private HashMap<Integer, List<Navigation<Model>>> navigationMap;
 
@@ -81,31 +81,33 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     //executing chain
     @Override
     public void executeDefaultOrdered(Model model){
-        executor = new DefaultOrderedExecutor<>(this, model);
+
+        ChainExecutor<Model> executor = new DefaultOrderedExecutor<>(this, model);
         executeExecutor(executor);
+
     }
 
     @Override
     public void executeWhile(Model model, Predicate<Model> condition){
-        executor = new ConditionalExecutor<>(this, condition, model);
+        ChainExecutor<Model> executor = new ConditionalExecutor<>(this, condition, model);
         executeExecutor(executor);
     }
 
     @Override
     public void loop(Model model){
-        executor = new LoopExecutor<>(this, model);
+        ChainExecutor<Model> executor = new LoopExecutor<>(this, model);
         executeExecutor(executor);
     }
 
     @Override
     public void loopWhile(Model model, Predicate<Model> condition){
-        executor = new LoopUntilExecutor<>(this, condition, model);
+        ChainExecutor<Model> executor = new LoopUntilExecutor<>(this, condition, model);
         executeExecutor(executor);
     }
 
     @Override
     public void loopNTimes(Model model, int loops){
-        executor = new LoopNExecutor<>(this, loops, model);
+        ChainExecutor<Model> executor = new LoopNExecutor<>(this, loops, model);
         executeExecutor(executor);
     }
 

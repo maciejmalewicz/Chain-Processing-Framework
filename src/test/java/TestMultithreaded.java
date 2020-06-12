@@ -25,20 +25,24 @@ public class TestMultithreaded {
     }
 
     @Test
-    public void multithreadedLoop(){
+    public void testTripleLoop(){
         Chain<TestModel> chain = new Chain<>(
-                new SimpleChainNode<>(m -> m.number++),
-                new SimpleChainNode<>(m -> m.number += 2)
+                new SimpleChainNode<>(m -> m.number++)
         );
+
         for (int i = 0; i < 100; i++){
+            TestModel current = new TestModel();
             new Thread(){
                 @Override
-                public void run() {
-                    TestModel model = new TestModel();
-                    chain.loopNTimes(model, 10);
-                    Assert.assertEquals(model.number, 30);
+                public void run(){
+                    chain.loopNTimes(current, 100);
+                    if (current.number != 100){
+                        System.out.println("!!!");
+                    }
                 }
             }.start();
+
         }
     }
+
 }
