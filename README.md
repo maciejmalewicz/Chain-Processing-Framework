@@ -165,6 +165,181 @@ Chain modifying methods:
 - `insertNode(ChainNode<? super Model> node, int index)` – adds new node to the chains list on specified position
 - `removeNode(ChainNode<? super Model> node)` – removes node from the chain
 
+## Chain execution modes
+<b>Chains</b> can be executed in a several ways, by calling different methods on them. These are:
+-	`executeDefaultOrdered(Model model)` – simply makes <b>Chain</b> running from beginning to end.
+-	`executeWhile(Model model, Predicate<Model> condition)` – does exactly the same thing as above, but before execution of each <b>Node</b>,the condition is being checked. If it’s not satisfied, <b>Chain</b> stops.
+-	`loop(Model model)` – makes <b>Chain</b> running over and over – from beginning to end. May be stopped only by invoking `stop()`.
+-	`loopWhile(Model model, Predicate<Model> condition)` – does exactly the same as above, but at every loop beginning the condition is checked. If it’s not satisfied, <b>Chain</b> stops
+-	`loopNTimes(Model model, int times)` – executes all <b>Nodes</b> in order n times
+
+## Combining execution methods with node methods
+Node methods and chain methods cope with each other in a different, but predictable ways. Here are 3 methods 
+(and not the only ones) of implementing counting from 1 to 10.
+
+Fist approach is probably the least appropriate. Instead of using a loop, we are restarting the <b>Chain</b> manually from the last <b>Node</b>, until it has printed "10". It works, but in this framework we
+have better (more readable) ways to do it.
+```java
+public class First10 {
+    public static void main(String[] args) {
+        Model model = new Model();
+        model.num = 1;
+        Chain<Model> chain = new Chain<>(
+                new SimpleChainNode<>(m -> System.out.println(m.num)),
+                new SimpleChainNode<>(m -> m.num++),
+                new ChainNode<Model>() {
+                    @Override
+                    public void execute(Model model) {
+                        if (model.num <= 10){
+                            restart();
+                        }
+                    }
+                }
+        );
+        chain.executeDefaultOrdered(model);
+
+    }
+}
+```
+
+In second example, we are using `loopWhile()`. Instead of creating 3 <b>Nodes</b> now, we created only one. We could have divided printing and incrementing into two <b>Nodes</b>, but there is no need. Loop is printing numbers until "10", because of the predicate 
+`m -> m.num <= 10`. If number exceeds "10", predicate returns false and loop finishes. This approach is much better than previous one, but still we can do better.
+```java
+public class Second10 {
+    public static void main(String[] args) {
+        Model model = new Model();
+        model.num = 1;
+        Chain<Model> chain = new Chain<>(
+                new ChainNode<Model>() {
+                    @Override
+                    public void execute(Model model) {
+                        System.out.println(model.num);
+                        model.num++;
+                    }
+                }
+        );
+        chain.loopWhile(model, m -> m.num <= 10);
+    }
+}
+```
+
+In third example, we are doing something very similar, but instead of `loopWhile` we use `loopNTimes`. It works in a very similar way, but here instead of saying until when should it print, we are saying how many times.
+```java
+public class Third10 {
+    public static void main(String[] args) {
+        Chain<Model> chain = new Chain<>(
+                new ChainNode<Model>() {
+                    @Override
+                    public void execute(Model model) {
+                        System.out.println(model.num);
+                        model.num++;
+                    }
+                }
+        );
+        Model model = new Model();
+        model.num = 1;
+        chain.loopNTimes(model, 10);
+    }
+}
+```
+
+These were just examples of how the framework works. Of course, using good old "for loop" is much better in this case, and in examples above we are abusing chains. 
+
+```java
+public class Fourth10 {
+    public static void main(String[] args) {
+        for (int i = 1; i <= 10; i++){
+            System.out.println(i);
+        }
+    }
+}
+```
+> Implementation without using framework
+
+## Navigations – chain nodes flexibility problem
+Let’s imagine following situation:
+![alt text](https://i.imgur.com/0TItCqm.png)
+
+We have 2 <b>Chains</b> using the same <b>Nodes</b> – "Get Price" and "Validate", if customer has enough money. There is a problem in second one. In "PAYMENT" chain, we don’t charge customers account if customer doesn’t have enough money – we skip one node, order is being changed. In the second one, we don’t skip anything and chain goes on. What we could do in this situation is:
+-	use `skipNode(ChainNode node)` method in validating payment node. This would work for this case, but what if we had third chain like this:
+
+![alt text](https://i.imgur.com/IgLMKxZ.png)
+
+> Here, we assume that customer has second account that we can always charge if he doesn’t have enough money. So in this case, we can’t skip charging account node anymore. 
+
+-	Another solution would be to implement validating node twice – once with skipping and once without it. This is bad, because we might have another chain that will need even different behaviour.
+-	We can use <b>Navigations</b>.
+
+## Navigations – idea
+In order to avoid the problem discussed above, we can separate <b>ordering nodes</b> from <b>nodes</b> themselves and encapsulate ordering in <b>Navigations</b>. It means, we will leave "validating node" without any chain functions and add some properties to a particular <b>Chain</b>. Like this, we can separate ordering process from business logic of <b>Nodes</b>.
+
+## Navigations – implementation
+Class `Navigation` is a generic type (Navigation<Model>) and has two similar constructors:
+-	`Navigation(ChainNode<Model> from, ChainNode<Model> to)`
+-	`Navigation(ChainNode<Model> from, ChainNode<Model> to, Predicate<Model> condition)`
+  
+Both of these have "from" and "to" node. When we apply navigation to the chain, every time after executing "from" chain, navigation will proceed to "to" node. This happens in case we use first constructor. Second constructor gives us a bit more control. We pass here also a predicate which will be checked every time, when navigation is trying to move chain to "to". If predicate will return false, navigation will fail and default order from chain processing mode will be used - chain execution mode will decide, which node is executed next.
+  
+## Navigations – collatz example (how it can be used in algorithms)
+Let’s see, a collatz sequence example. In this case, framework will actually improve readability of the code and save programmer a bit of struggle. 
+Our job is to simply print over and over next terms of collatz sequence starting from number we choose (let’s say "500"). Generating next term of collatz sequence is based on the previous one. If previous is even, our next term is equal to "previous/2" and if it’s odd, next term is equal to "3*previous + 1". We will divide generating each term into 3 different nodes:
+- Print current term
+-	Do n/2 (when printed term was even)
+-	Do 3n+1 (when printed term was odd)
+Now we won’t use loops or any chain node functions, we will use only navigations on these 3 steps. We will be printing current term, then generating next one using second and third node and then go back to first, printing node. And repeat. 
+
+![alt text](https://i.imgur.com/fNMOTmd.png)
+
+Let’s see implementation. We will be using `isEven(int num)` function:
+```java
+private static boolean isEven(int num){
+    return num%2 == 0;
+}
+```
+
+And here we go:
+```java
+public static void main(String[] args) {
+
+        //creating chain
+        SimpleChainNode<Model> printingNode = new SimpleChainNode<>(m -> System.out.println(m.num));
+        SimpleChainNode<Model> evenNode = new SimpleChainNode<>(m -> m.num /= 2);
+        SimpleChainNode<Model> oddNode = new SimpleChainNode<>(m -> m.num = m.num*3 + 1);
+        Chain<Model> chain = new Chain<>(
+                printingNode,
+                evenNode,
+                oddNode
+        );
+
+        //adding navigations
+        Navigation<Model> toEvenNavigation = new Navigation<>(printingNode, evenNode, m -> isEven(m.num));
+        Navigation<Model> toOddNavigation = new Navigation<>(printingNode, oddNode, m -> !isEven(m.num));
+        Navigation<Model> fromEvenNavigation = new Navigation<>(evenNode, printingNode);
+        Navigation<Model> fromOddNavigation = new Navigation<>(oddNode, printingNode);
+
+        chain.addNavigation(toEvenNavigation);
+        chain.addNavigation(toOddNavigation);
+        chain.addNavigation(fromEvenNavigation);
+        chain.addNavigation(fromOddNavigation);
+
+        //executing infinite loop
+        Model model = new Model();
+        model.num = 500;
+        chain.executeDefaultOrdered(model);
+    }
+```
+This is one way of implementing it. Not the shortest way, but it requires from programmer less thinking about what can go wrong, etc. 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
