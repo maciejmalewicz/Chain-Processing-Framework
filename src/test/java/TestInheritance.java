@@ -1,4 +1,5 @@
 import executionChains.Chain;
+import executionChains.Navigation;
 import inheritance.BaseModel;
 import inheritance.ComplexModel;
 import inheritance.DoubleIncreasingNode;
@@ -28,5 +29,18 @@ public class TestInheritance {
         chain.executeDefaultOrdered(model);
         Assert.assertEquals(model.num1, 2);
         Assert.assertEquals(model.num2, 1);
+    }
+
+    @Test
+    public void testInheritedNavigations(){
+        IncreasingNode node = new IncreasingNode();
+        DoubleIncreasingNode node2 = new DoubleIncreasingNode();
+
+        Chain<ComplexModel> chain = new Chain<>(
+                node,
+                node2
+        );
+        //Navigation<BaseModel> navigation = new Navigation<>(node, node2);
+        ComplexModel model = new ComplexModel();
     }
 }
