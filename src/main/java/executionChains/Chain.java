@@ -14,7 +14,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     private List<ChainNode<? super Model>> nodes;
     private ChainExecutor<Model> executor;
     private HashMap<Integer, Integer> nodesMap;
-    private HashMap<Integer, List<Navigation<Model>>> navigationMap;
+    private HashMap<Integer, List<Navigation<? super Model>>> navigationMap;
 
     //constructors
     @SafeVarargs
@@ -38,11 +38,11 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
     //chain editing methods
 
-    public void pushNode(ChainNode<Model> node){
+    public void pushNode(ChainNode<? super Model> node){
         nodes.add(node);
     }
 
-    public boolean insertNode(ChainNode<Model> node, int index){
+    public boolean insertNode(ChainNode<? super Model> node, int index){
         if (index < nodes.size()){
             nodes.add(index, node);
             return true;
@@ -50,21 +50,21 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
         return false;
     }
 
-    public boolean removeNode(ChainNode<Model> node){
+    public boolean removeNode(ChainNode<? super Model> node){
         return nodes.remove(node);
     }
 
     //navigation
 
-    public void addNavigation(Navigation<Model> navigation){
-        ChainNode<Model> node = navigation.getFrom();
+    public void addNavigation(Navigation<? super Model> navigation){
+        ChainNode<? super Model> node = navigation.getFrom();
         addNavigationListIfAbsent(node);
         int id = node.chainNodeId;
-        List<Navigation<Model>> navigationList = navigationMap.get(id);
+        List<Navigation<? super Model>> navigationList = navigationMap.get(id);
         navigationList.add(navigation);
     }
 
-    private void addNavigationListIfAbsent(ChainNode<Model> node){
+    private void addNavigationListIfAbsent(ChainNode<? super Model> node){
         int nodeId = node.chainNodeId;
         if (!navigationMap.containsKey(nodeId)){
             navigationMap.put(nodeId, new ArrayList<>());
@@ -72,7 +72,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     }
 
 
-    public List<Navigation<Model>> getNavigationList(ChainNode<? super Model> node){
+    public List<Navigation<? super Model>> getNavigationList(ChainNode<? super Model> node){
         int nodeId = node.chainNodeId;
         return navigationMap.get(nodeId);
     }
