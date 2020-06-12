@@ -328,7 +328,20 @@ public static void main(String[] args) {
         chain.executeDefaultOrdered(model);
     }
 ```
-This is one way of implementing it. Not the shortest way, but it requires from programmer less thinking about what can go wrong, etc. 
+This is one way of implementing it. Not the shortest way, but it requires from programmer less thinking about what can go wrong, etc.
+
+## Rules
+Let's finally define some rules how to use it.
+
+What we can do:
+- We can add <b>Nodes</b> to the <b>Chain</b> only at the beginning, they will be reused each time when <b>chain</b> is executed.
+- We can use one <b>Navigation</b> in many <b>Chains</b>.
+
+What we can't do:
+- We shouldn't add a single <b>Node</b> to multiple <b>Chains</b>. For each <b>Chain</b> there should be a separate instance. This is because <b>Nodes</b> are connected to particular <b>Chain</b> and executing <b>Chain</b> reset the binding. Thus, it's better to use
+`new [MyNode]` instead of <b>singletons</b> or <b>dependency injection</b>.
+- We can't execute chain, so that it works on more than 1 different thread simultaneously. If we want to achieve that, we should
+instantiate multiple chains and execute them in multiple threads then. This is for the same reason as problem above.
 
 
 
