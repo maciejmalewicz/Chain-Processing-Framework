@@ -4,17 +4,17 @@ import java.util.function.Predicate;
 
 public class Navigation<Model> {
 
-    private ChainNode<Model> from;
-    private ChainNode<Model> to;
+    private ChainNode<? super Model> from;
+    private ChainNode<? super Model> to;
     private Predicate<Model> predicate;
 
-    public Navigation(ChainNode<Model> from, ChainNode<Model> to){
+    public Navigation(ChainNode<? super Model> from, ChainNode<? super Model> to){
         this.from = from;
         this.to = to;
         predicate = m -> true;
     }
 
-    public Navigation(ChainNode<Model> from, ChainNode<Model> to, Predicate<Model> condition){
+    public Navigation(ChainNode<? super Model> from, ChainNode<? super Model> to, Predicate<Model> condition){
         this.from = from;
         this.to = to;
         predicate = condition;
@@ -24,11 +24,11 @@ public class Navigation<Model> {
         return predicate.test(model);
     }
 
-    public ChainNode<Model> getFrom() {
+    public ChainNode<? super Model> getFrom() {
         return from;
     }
 
-    public ChainNode<Model> getTo() {
+    public ChainNode<? super Model> getTo() {
         return to;
     }
 }

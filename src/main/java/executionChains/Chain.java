@@ -14,7 +14,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     private List<ChainNode<? super Model>> nodes;
     private ChainExecutor<Model> executor;
     private HashMap<Integer, Integer> nodesMap;
-    private HashMap<Integer, List<Navigation<? super Model>>> navigationMap;
+    private HashMap<Integer, List<Navigation<Model>>> navigationMap;
 
     //constructors
     @SafeVarargs
@@ -56,11 +56,11 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
     //navigation
 
-    public void addNavigation(Navigation<? super Model> navigation){
+    public void addNavigation(Navigation<Model> navigation){
         ChainNode<? super Model> node = navigation.getFrom();
         addNavigationListIfAbsent(node);
         int id = node.chainNodeId;
-        List<Navigation<? super Model>> navigationList = navigationMap.get(id);
+        List<Navigation<Model>> navigationList = navigationMap.get(id);
         navigationList.add(navigation);
     }
 
@@ -72,7 +72,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     }
 
 
-    public List<Navigation<? super Model>> getNavigationList(ChainNode<? super Model> node){
+    public List<Navigation<Model>> getNavigationList(ChainNode<? super Model> node){
         int nodeId = node.chainNodeId;
         return navigationMap.get(nodeId);
     }

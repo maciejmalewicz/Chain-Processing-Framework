@@ -125,11 +125,11 @@ public abstract class ChainExecutor <Model> implements Iterator<ChainNode<? supe
     }
 
     private int getNavigatedNext(ChainNode<? super Model> node){
-        List<Navigation<? super Model>> navigationList = processer.getNavigationList(node);
+        List<Navigation<Model>> navigationList = processer.getNavigationList(node);
         if (navigationList == null){
             return -1;
         }
-        for (Navigation<? super Model> navigation: navigationList){
+        for (Navigation<Model> navigation: navigationList){
             if (navigation.canBeUsed(model)){
                 return processer.getNodeIndex(navigation.getTo());
             }

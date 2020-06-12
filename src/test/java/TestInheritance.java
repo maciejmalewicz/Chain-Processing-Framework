@@ -37,10 +37,14 @@ public class TestInheritance {
         DoubleIncreasingNode node2 = new DoubleIncreasingNode();
 
         Chain<ComplexModel> chain = new Chain<>(
-                node,
-                node2
+                node2,
+                node
         );
-        //Navigation<BaseModel> navigation = new Navigation<>(node, node2);
+        Navigation<ComplexModel> navigation = new Navigation<>(node, node2, m -> m.num1 < 10);
+        chain.addNavigation(navigation);
         ComplexModel model = new ComplexModel();
+        chain.executeDefaultOrdered(model);
+        Assert.assertEquals(model.num1, 10);
+        Assert.assertEquals(model.num2, 5);
     }
 }
