@@ -19,7 +19,7 @@
                 <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
+                    <serverId>com.github.maciejmalewicz</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
@@ -90,7 +90,7 @@
 
     <groupId>com.github.maciejmalewicz</groupId>
     <artifactId>Chain-Processing-Framework</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 
     <name>Chain Processing Framework</name>
     <description>Small library for managing complex pipeline processing.</description>
@@ -105,11 +105,11 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
+            <id>com.github.maciejmalewicz</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
+            <id>com.github.maciejmalewicz</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
@@ -119,7 +119,7 @@
             <name>Maciej Malewicz</name>
             <email>maciej.malewicz.it@gmail.com</email>
             <organization>com.github.maciejmalewicz</organization>
-            <organizationUrl>>https://github.com/maciejmalewicz</organizationUrl>
+            <organizationUrl>https://github.com/maciejmalewicz</organizationUrl>
         </developer>
     </developers>
 
