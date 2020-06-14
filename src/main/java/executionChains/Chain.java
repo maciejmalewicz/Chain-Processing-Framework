@@ -130,7 +130,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
     //preparing for execution
     private void prepareExecution(ChainExecutor<Model> executor){
-        connectNodes(executor);
+        //connectNodes(executor);
         initializeNodeMap();
 
     }
@@ -145,8 +145,8 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
 
 
-    private void connectNodes(ChainExecutor<Model> executor){
-        nodes.forEach(n -> n.setExecutor(executor));
-    }
+//    private void connectNodes(ChainExecutor<Model> executor){
+//        nodes.forEach(n -> n.setExecutor(executor));
+//    }
 
 }

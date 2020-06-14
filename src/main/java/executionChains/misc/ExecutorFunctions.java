@@ -5,7 +5,7 @@ import executionChains.chainExecutors.NodeNotFoundException;
 
 import java.util.List;
 
-public interface ChainNodeFunctions {
+public interface ExecutorFunctions {
     void stop();
     void goTo(int index) throws ArrayIndexOutOfBoundsException;
     void goTo(ChainNode node) throws NodeNotFoundException;

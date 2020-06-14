@@ -1,6 +1,7 @@
 import executionChains.ChainNode;
 import executionChains.Chain;
 import executionChains.SimpleChainNode;
+import executionChains.chainExecutors.ChainExecutor;
 import executionChains.chainExecutors.NodeNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,8 +28,8 @@ public class DefaultTest {
 
         ChainNode<TestModel> stoppingNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
-                stop();
+            public void execute(TestModel testModel, ChainExecutor executor) {
+                executor.stop();
             }
         };
         processer.pushNode(stoppingNode);
@@ -45,9 +46,9 @@ public class DefaultTest {
         SimpleChainNode<TestModel> addingNode = new SimpleChainNode<>(m -> m.number += 2);
         ChainNode<TestModel> goToNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
+            public void execute(TestModel testModel, ChainExecutor executor) {
                 if (testModel.number < 10){
-                    goTo(0);
+                    executor.goTo(0);
                 }
             }
         };
@@ -65,10 +66,10 @@ public class DefaultTest {
         SimpleChainNode<TestModel> addingNode = new SimpleChainNode<>(m -> m.number += 2);
         ChainNode<TestModel> goToNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
+            public void execute(TestModel testModel, ChainExecutor executor) {
                 if (testModel.number < 10){
                     try {
-                        goTo(addingNode);
+                        executor.goTo(addingNode);
                     } catch (NodeNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -89,9 +90,9 @@ public class DefaultTest {
         SimpleChainNode<TestModel> addingNode = new SimpleChainNode<>(m -> m.number++);
         ChainNode<TestModel> restartingNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
+            public void execute(TestModel testModel, ChainExecutor executor) {
                 if (testModel.number < 10){
-                    restart();
+                    executor.restart();
                 }
             }
         };
@@ -103,14 +104,14 @@ public class DefaultTest {
     }
 
     @Test
-    public void skipToEnd(){
+    public void testSkipToEnd(){
         TestModel model = new TestModel();
         model.number = 0;
         Chain<TestModel> processer = new Chain<>();
         ChainNode<TestModel> skippingNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
-                skipToEnd();
+            public void execute(TestModel testModel, ChainExecutor executor) {
+                executor.skipToEnd();
             }
         };
         processer.pushNode(skippingNode);
@@ -127,8 +128,8 @@ public class DefaultTest {
         SimpleChainNode<TestModel> skippedNode = new SimpleChainNode<>(m -> m.number++);
         ChainNode<TestModel> skippingNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
-                skipNode(skippedNode);
+            public void execute(TestModel testModel, ChainExecutor executor) {
+                executor.skipNode(skippedNode);
             }
         };
         processer.pushNode(skippingNode);

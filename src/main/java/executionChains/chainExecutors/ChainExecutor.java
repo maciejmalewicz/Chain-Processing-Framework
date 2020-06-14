@@ -3,12 +3,12 @@ package executionChains.chainExecutors;
 import executionChains.ChainNode;
 import executionChains.Chain;
 import executionChains.Navigation;
-import executionChains.misc.ChainNodeFunctions;
+import executionChains.misc.ExecutorFunctions;
 
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class ChainExecutor <Model> implements Iterator<ChainNode<? super Model>>, ChainNodeFunctions {
+public abstract class ChainExecutor <Model> implements Iterator<ChainNode<? super Model>>, ExecutorFunctions {
 
     boolean needsNavigation = true;
     boolean proceeds = true;

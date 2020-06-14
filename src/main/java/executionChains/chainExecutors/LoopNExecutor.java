@@ -30,7 +30,7 @@ public class LoopNExecutor<Model> extends LoopExecutor<Model>{
             needsNavigation = true;
             ChainNode<? super Model> node = next();
             if (canBeExecuted(node)){
-                node.execute(model);
+                node.execute(model, this);
             }
             if (needsNavigation){
                 updateNextIndex(node);

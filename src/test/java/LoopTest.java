@@ -1,6 +1,7 @@
 import executionChains.ChainNode;
 import executionChains.Chain;
 import executionChains.SimpleChainNode;
+import executionChains.chainExecutors.ChainExecutor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,10 +15,10 @@ public class LoopTest {
         Chain<TestModel> processer = new Chain<>();
         ChainNode<TestModel> chainNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel model) {
+            public void execute(TestModel model, ChainExecutor executor) {
                 model.number++;
                 if (model.number >= 10){
-                    stop();
+                    executor.stop();
                 }
             }
         };
@@ -54,8 +55,8 @@ public class LoopTest {
         Chain<TestModel> processer = new Chain<>();
         ChainNode<TestModel> skippingNode = new ChainNode<TestModel>() {
             @Override
-            public void execute(TestModel testModel) {
-                skipToEnd();
+            public void execute(TestModel testModel, ChainExecutor executor) {
+                executor.skipToEnd();
             }
         };
         processer.pushNode(skippingNode);

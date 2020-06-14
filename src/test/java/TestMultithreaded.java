@@ -41,8 +41,35 @@ public class TestMultithreaded {
                     }
                 }
             }.start();
-
         }
+    }
+
+    @Test
+    public void testNewNodeDividedFeature(){
+        ChainNode<TestModel> node = new SimpleChainNode<>(m -> m.number++);
+        Chain<TestModel> chain1 = new Chain<>(
+                node
+        );
+        Chain<TestModel> chain2 = new Chain<>(
+                node
+        );
+        TestModel model1 = new TestModel();
+        TestModel model2 = new TestModel();
+
+        new Thread(){
+            @Override
+            public void run(){
+                chain1.loopNTimes(model1, 10);
+                Assert.assertEquals(model1.number, 10);
+            }
+        }.start();
+        new Thread(){
+            @Override
+            public void run(){
+                chain2.loopNTimes(model2, 10);
+                Assert.assertEquals(model2.number, 10);
+            }
+        }.start();
     }
 
 }

@@ -90,7 +90,7 @@
 
     <groupId>com.github.maciejmalewicz</groupId>
     <artifactId>Chain-Processing-Framework</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <name>Chain Processing Framework</name>
     <description>Small library for managing complex pipeline processing.</description>

@@ -1,5 +1,7 @@
 package executionChains;
 
+import executionChains.chainExecutors.ChainExecutor;
+
 public class SimpleChainNode <Model> extends ChainNode<Model> {
 
     private ChainFunction<Model> function;
@@ -9,7 +11,7 @@ public class SimpleChainNode <Model> extends ChainNode<Model> {
     }
 
     @Override
-    public void execute(Model model) {
+    public void execute(Model model, ChainExecutor executor) {
         function.execute(model);
     }
 }
