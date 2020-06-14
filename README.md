@@ -13,8 +13,7 @@ It provides programmer with set of classes, that help managing order of methods 
 User can create so called <b>Chain Nodes</b> and put them into <b>Chain</b>, in order to use their methods and 
 organize the processing. Here is the structure of solution, using framework:
 ![alt text](https://i.imgur.com/0KnbIHV.png)
-We implement <b>Chain Node</b> abstract class in our customized way, by implementing void method `execute(Model model)`.
-<b>Chain Node</b> is a generic class with Type parameter <b>Model</b>, so method <b>execute</b> can be called with any type
+We implement <b>Chain Node</b> abstract class in our customized way, by implementing void method `execute(Model model, ChainExecutor executor)`. <b>Chain Node</b> is a generic class with Type parameter <b>Model</b>, so method <b>execute</b> can be called with any type
 of parameter we want. Example implementation of <b>Chain Node</b> with its model:
 ```java
 public class Model {
@@ -27,7 +26,7 @@ public class Model {
 public class IncrementingNode extends ChainNode <Model> {
 
   @Override
-  public void execute(Model model) {
+  public void execute(Model model, ChainExecutor executor) {
     model.num++;
   }
 }
@@ -44,13 +43,13 @@ public class Main {
 
         ChainNode<Model> node1 = new ChainNode<Model>() {
             @Override
-            public void execute(Model model) {
+            public void execute(Model model, ChainExecutor executor) {
                 model.num += 2;
             }
         };
         ChainNode<Model> node2 = new ChainNode<Model>() {
             @Override
-            public void execute(Model model) {
+            public void execute(Model model, ChainExecutor executor) {
                 model.num += 3;
             }
         };
@@ -71,7 +70,7 @@ So in this case, `node1` has been executed before `node2`.
 ## Faster ways of creating <b>Chain Nodes</b>
 Unfortunately, we can’t create chain nodes using lambdas, because they aren’t functional interfaces. 
 They provide different, useful methods that will be discussed later. There is, however, a way to create them faster. 
-If we don’t want to use any of <b>Chain Node</b> built in methods, we can create <b>Simple Chain Node</b>, 
+If we don’t want to use any of <b>Executors</b> built in methods, we can create <b>Simple Chain Node</b>, 
 which extends <b>Chain Node</b>. <b>Simple Chain Node</b> can take a lambda as a constructor parameter 
 (which is implementation of <b>Chain Function</b> functional interface). Might sound complicated, but it’s actually very simple.
 Here is the program shown above, but with <b>Chain Nodes</b> implemented as <b>Simple Chain Nodes</b>:
@@ -94,11 +93,12 @@ In this way we save a bit of work, but we can’t use full potential of <b>Chain
 <b>Simple Chain Nodes</b>, it’s probably easier not to use this framework, but they might be useful when complexity of nodes 
 are different and order of execution is not that simple.
 
-## <b>Chain Node</b> functions
-Now, let’s discuss these functions implemented in <b>Chain Nodes</b>. They all communicate with <b>Chain</b> 
-(maybe not exactly with chain, but for now we can assume it’s chain) they are linked with, so if we will just execute this functions 
-outside of <b>Chains</b> process, they will throw some Nullpointers!
-That’s why we should invoke these functions only inside of `execute` implementation of our <b>Chain Node</b>.
+## <b>Chain Executors</b> functions
+Now, let’s discuss these functions implemented in <b>Chain Executor</b>. Have you noticed this `ChainExecutor executor`
+we pass as a second parameter in `execute()` method? This is how we can communicate with the chain from the node. <b>Executors</b> 
+are the objects, that are being created, when some <b>Chain methods</b> like `executeDefaultOrdered()` are being invoked. We 
+shouldn't care too much about this and we shouldn't create <b>Executors</b> on our own! This is responsibility of <b>Chain</b>.
+What we care about, are methods provided in <b>Executors</b>.
 
 Let's describe, what they do:
 - `void stop()` makes the <b>Chain</b> stop right after execution of node in which it was invoked. Tip: Adding `return;` after it will 
@@ -130,8 +130,8 @@ public class Main {
         ChainNode<Model> firstNode = new SimpleChainNode<>(n -> n.num += 2);
         ChainNode<Model> stoppingNode = new ChainNode<Model>() {
             @Override
-            public void execute(Model model) {
-                stop();
+            public void execute(Model model, ChainExecutor executor) {
+                executor.stop();
                 model.num += 3;
             }
         };
@@ -147,7 +147,7 @@ public class Main {
 Program prints "Result is: 5". That's happening is:
 -	`firstNode` is being executed – number in model increases and becomes a "2"
 - `stoppingNode` is being executed and so
-  -	`stop()` is being invoked – it blocks any other remaining <b>Nodes</b> from being executed
+  -	`executor.stop()` is being invoked – it blocks any other remaining <b>Nodes</b> from being executed
   - number in model is being increased anyway and it becomes a "5"
 -	`skippedNode` isn’t executed anymore, because it was stopped by the `stoppingNode`. Number in model is not increased by 4,
 so it remains "5" until the and.
@@ -191,9 +191,9 @@ public class First10 {
                 new SimpleChainNode<>(m -> m.num++),
                 new ChainNode<Model>() {
                     @Override
-                    public void execute(Model model) {
+                    public void execute(Model model, ChainExecutor executor) {
                         if (model.num <= 10){
-                            restart();
+                            executor.restart();
                         }
                     }
                 }
@@ -332,7 +332,10 @@ public static void main(String[] args) {
 ```
 This is one way of implementing it. Not the shortest way, but it requires from programmer less thinking about what can go wrong, etc.
 
-## Rules
+## Rules - for versions 1.0.3+
+Since 1.0.3, user is able to use a single <b>Chain Node</b> in multiple <b>Chains</b>. This works for multithreaded apps too. Therefore, we can use dependency injection and singletones. 
+
+## Rules - for versions below 1.0.3
 Let's finally define some rules how to use it.
 
 What we can do:
