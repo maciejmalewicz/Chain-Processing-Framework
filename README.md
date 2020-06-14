@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.maciejmalewicz/Chain-Processing-Framework/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.maciejmalewicz/Chain-Processing-Framework)
+
 # Chain-Processing-Framework
 ## What is it?
 It’s a small library, responsible for managing order of processes execution. 
