@@ -37,7 +37,6 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     }
 
     //chain editing methods
-
     public void pushNode(ChainNode<? super Model> node){
         nodes.add(node);
     }
@@ -112,7 +111,7 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
     }
 
     private synchronized void executeExecutor(ChainExecutor<Model> executor){
-        prepareExecution(executor);
+        prepareExecution();
         executor.execute(nodes);
     }
 
@@ -129,10 +128,8 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
 
 
     //preparing for execution
-    private void prepareExecution(ChainExecutor<Model> executor){
-        //connectNodes(executor);
+    private void prepareExecution(){
         initializeNodeMap();
-
     }
 
     private void initializeNodeMap() {
@@ -142,11 +139,4 @@ public class Chain<Model> implements ChainExecutingFunctions <Model> {
             nodesMap.put(nodeId, i);
         }
     }
-
-
-
-//    private void connectNodes(ChainExecutor<Model> executor){
-//        nodes.forEach(n -> n.setExecutor(executor));
-//    }
-
 }

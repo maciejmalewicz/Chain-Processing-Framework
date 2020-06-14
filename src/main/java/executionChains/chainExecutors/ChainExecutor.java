@@ -62,36 +62,6 @@ public abstract class ChainExecutor <Model> implements Iterator<ChainNode<? supe
         setNextIndex(index);
     }
 
-    //    @Override
-//    public void skipUntil(ChainNode targetNode) throws NodeNotFoundException {
-//        for (int i = nextIndex; i < nodes.size(); i++){
-//            ChainNode<Model> node = nodes.get(i);
-//            if (targetNode.equals(node)){
-//                setNextIndex(i);
-//                return;
-//            }
-//        }
-//        throw new NodeNotFoundException("Node " + targetNode + " not found!");
-//    }
-//
-//    @Override
-//    public void goBackUntil(ChainNode targetNode) throws NodeNotFoundException{
-//        int startingIndex = getBackwardsStartingIndex();
-//        for (int i = startingIndex; i >=0; i--){
-//            ChainNode<Model> node = nodes.get(i);
-//            if (targetNode.equals(node)){
-//                setNextIndex(i);
-//                return;
-//            }
-//        }
-//        throw new NodeNotFoundException("Node " + targetNode + " not found!");
-//    }
-
-    private int getBackwardsStartingIndex(){
-        return nextIndex-1;
-    }
-
-
     @Override
     public void restart() {
         setNextIndex(0);
